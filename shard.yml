@@ -1,0 +1,13 @@
+name: etcd
+version: 0.1.0
+
+authors:
+  - Jari Kolehmainen <jari.kolehmainen@gmail.com>
+
+targets:
+  etcd:
+    main: src/etcd.cr
+
+crystal: 0.20.3
+
+license: MIT
