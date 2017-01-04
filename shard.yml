@@ -10,4 +10,9 @@ targets:
 
 crystal: 0.20.3
 
+dependencies:
+  spec2:
+    github: waterlink/spec2.cr
+    version: ~> 0.9
+
 license: MIT

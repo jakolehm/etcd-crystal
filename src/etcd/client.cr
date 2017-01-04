@@ -18,6 +18,7 @@ module Etcd
 
     def initialize(config : Config)
       @client = HTTP::Client.new(config.host, config.port)
+      @form_headers = HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded"}
     end
 
     def keys : KeysApi
@@ -31,26 +32,37 @@ module Etcd
     def get(path : String, params = {} of String => String) : HTTP::Client::Response
       uri_path = path
       unless params.empty?
-        uri_path += params.map{ |k, v| "#{k}=#{v}"}.join("&")
+        uri_path += self.map_params(params)
       end
       res = @client.get(uri_path)
       handle_response(res)
     end
 
-    def put(path : String, body : HTTP::Client::BodyType, params = {} of String => String) : HTTP::Client::Response
+    def put(path : String, body : Hash, params = {} of String => String) : HTTP::Client::Response
       uri_path = path
       unless params.empty?
-        uri_path += params.map{ |k, v| "#{k}=#{v}"}.join("&")
+        uri_path += self.map_params(params)
       end
-      handle_response(@client.put(uri_path, nil, body))
+      form_data = self.map_params(body)
+      handle_response(@client.put(uri_path, @form_headers, form_data))
     end
 
-    def post(path : String, body : HTTP::Client::BodyType, params = {} of String => String) : HTTP::Client::Response
+    def post(path : String, body : Hash, params = {} of String => String) : HTTP::Client::Response
       uri_path = path
       unless params.empty?
-        uri_path += params.map{ |k, v| "#{k}=#{v}"}.join("&")
+        uri_path += self.map_params(params)
       end
-      handle_response(@client.post(uri_path, nil, body))
+      form_data = self.map_params(body)
+      handle_response(@client.post(uri_path, @form_headers, form_data))
+    end
+
+    def delete(path : String, params = {} of String => String) : HTTP::Client::Response
+      uri_path = path
+      unless params.empty?
+        uri_path += "?" + self.map_params(params)
+      end
+      res = @client.delete(uri_path)
+      handle_response(res)
     end
 
     def handle_response(res : HTTP::Client::Response) : HTTP::Client::Response
@@ -59,6 +71,10 @@ module Etcd
       else
         raise Error.from_http_response(res)
       end
+    end
+
+    def map_params(params : Hash)
+      params.map{ |k, v| "#{URI.escape(k.to_s)}=#{URI.escape(v.to_s)}" }.join("&")
     end
   end
 end
