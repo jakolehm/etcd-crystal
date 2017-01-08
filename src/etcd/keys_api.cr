@@ -71,7 +71,7 @@ module Etcd
       path = key_endpoint + key
       body = opts.to_hash
       body["value"] = value
-      res = @client.post(path, body.to_json)
+      res = @client.post(path, body)
       Keys::Response.from_http_response(res)
     end
 
@@ -106,7 +106,8 @@ module Etcd
       path = key_endpoint + key
       body = opts.to_hash
       body["dir"] = true
-      res = @client.put(path, body.to_json)
+      body["prevExist"] = false
+      res = @client.put(path, body)
       Keys::Response.from_http_response(res)
     end
 

@@ -29,6 +29,11 @@ module Etcd
       StatsApi.new(self)
     end
 
+    def version : JSON::Any
+      response = get("/version")
+      JSON.parse(response.body)
+    end
+
     def get(path : String, params = {} of String => String) : HTTP::Client::Response
       uri_path = path
       unless params.empty?

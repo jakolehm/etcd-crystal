@@ -11,7 +11,7 @@ module Etcd
         value: {type: String, nilable: true},
         expiration: {type: String, nilable: true},
         dir: {type: Bool, default: false},
-        nodes: {type: Array(Node), key: "nodes", nilable: true, default: [] of Node}
+        nodes: {type: Array(Node), key: "nodes", nilable: false, default: [] of Node}
       )
 
       def <=>(other : Node)
